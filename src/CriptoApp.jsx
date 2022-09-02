@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { FormQuoter } from './components';
 import brandImg from './assets/img/imagen-criptos.png';
@@ -39,17 +40,18 @@ const Img = styled.img`
   margin: 100px auto 0 auto;
   display: block;
 `
-
-// https://min-api.cryptocompare.com/data/pricemultifull?fsyms=[CRIPTO-KEY]&tsyms={KEY-COIN}
+// TODO: Here send last request, to show results
+// TODO: retrive this data: PRICE HIGHDAY LOWDAY CHANGEPCTDAY
+// ? https://min-api.cryptocompare.com/data/pricemultifull?fsyms=[CRIPTO-KEY]&tsyms={KEY-COIN}
 
 const CriptoApp = () => {
-
+  const [retriveResultCriptos, setRetriveResultCriptos] = useState([]);
   return (
     <Container>
       <Img src={brandImg} alt="Cripto Quiter App" />
       <div>
         <Header>Cripto Quiter in real Time, try it!</Header>
-        <FormQuoter />
+        <FormQuoter setRetriveResultCriptos={setRetriveResultCriptos} />
       </div>
     </Container>
   )

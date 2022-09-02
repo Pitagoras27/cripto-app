@@ -27,7 +27,7 @@ export const useSelect = (label, options = []) => {
         onChange={e => setOptionSelected(e.target.value)}
         value={optionSelected}
       >
-        <option value="select">Select your currency</option>
+        <option value="select">Select...</option>
         {
           options.map(coin => (
             <option

@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
+import { useEffect, useState } from "react";
 import { coins } from "../data/coins.js";
 import { useSelect } from "../hooks/useSelect";
+import { AlertMessage } from "./AlertMessage.jsx";
 
 const Input = styled.input`
   background-color: #9497FF;
@@ -17,26 +19,62 @@ const Input = styled.input`
   margin-top: 30px;
 `
 
-export const FormQuoter = () => {
-  const [ currencySelected, CurrencySelector ] = useSelect('Choose your Coin', coins);
-  const [ criptoSelected, CriptoSelector ] = useSelect('Choose your Cripto');
+export const FormQuoter = ({ setRetriveResultCriptos }) => {
+  const [ getCriptoOptions, setGetCriptoOptions] = useState([]);
+  const [ alertError, setAlertError] = useState(false);
+  const [ alertErrorMessage, setAlertErrorMessage] = useState('');
 
-  // TODO: do request to: // https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=[`currencySelected`]
+  const [ currencySelected, CurrencySelector ] = useSelect('Choose your Coin', coins);
+  const [ criptoSelected, CriptoSelector ] = useSelect('Choose your Cripto', getCriptoOptions);
+
+  useEffect(() => {
+
+    const getData = async() => {
+      try {
+        const currencyData = await fetch(
+          `https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=USD`);
+        const { Data } = await currencyData.json();
+
+        const criptoData = Data.map(item => ({
+            id: item.CoinInfo.Name,
+            name: item.CoinInfo.FullName
+          })
+        );
+
+        setGetCriptoOptions(criptoData);
+
+      } catch(err) {
+        setAlertErrorMessage('Don\'t retrive information, try later')
+        setAlertError(true);
+    
+      }
+    }
+
+    getData();
+  }, [currencySelected]);
 
   const onSubmitGetCryptoInfo = (e) => {
     e.preventDefault();
-    // Validate fields it's not empty
 
-    // If correct data sed info to parent via function state
-    // console.log(currencySelected);
+    if([currencySelected, criptoSelected].includes('')) {
+      setAlertErrorMessage('All fields are mandatory');
+      setAlertError(true);
+      return;
+    }
+
+    setAlertError(false);
+    setRetriveResultCriptos(getCriptoOptions);
   }
 
   return (
-    <form onSubmit={onSubmitGetCryptoInfo}>
-        <CurrencySelector />
-        <CriptoSelector />
+    <>
+      { alertError && (<AlertMessage>{alertErrorMessage}</AlertMessage>)}
+      <form onSubmit={onSubmitGetCryptoInfo}>
+          <CurrencySelector />
+          <CriptoSelector />
 
-        <Input type="submit" />
-    </form>
+          <Input type="submit" />
+      </form>
+    </>
   )
 }
