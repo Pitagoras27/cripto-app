@@ -1,7 +1,8 @@
-import { useState } from 'react';
 import styled from '@emotion/styled';
-import { FormQuoter } from './components';
+import { useEffect, useState } from 'react';
 import brandImg from './assets/img/imagen-criptos.png';
+import { FormQuoter, ResultQuote, Spinner } from './components';
+import { PATH_API } from './config/endpoints';
 import './styles/styles.css';
 
 const Container = styled.div`
@@ -40,18 +41,45 @@ const Img = styled.img`
   margin: 100px auto 0 auto;
   display: block;
 `
-// TODO: Here send last request, to show results
-// TODO: retrive this data: PRICE HIGHDAY LOWDAY CHANGEPCTDAY
-// ? https://min-api.cryptocompare.com/data/pricemultifull?fsyms=[CRIPTO-KEY]&tsyms={KEY-COIN}
 
 const CriptoApp = () => {
   const [retriveResultCriptos, setRetriveResultCriptos] = useState([]);
+  const [results, setResults] = useState({});
+  const [loader, setLoader] = useState(false);
+  
+  useEffect(() => {
+    const retriveResults = Object.keys(retriveResultCriptos);
+    if(retriveResults.length > 0) {
+      setResults({});
+      setLoader(true);
+      const { currencySelected, criptoSelected } = retriveResultCriptos;
+      
+      const getData = async() => {
+        try {
+          const res = await fetch(`${PATH_API}/pricemultifull?fsyms=${criptoSelected}&tsyms=${currencySelected}`);
+          const getResult = await res.json();
+
+          setResults(getResult.DISPLAY[criptoSelected][currencySelected]);
+          setLoader(false);
+        } catch (error) {
+          console.log({error});
+          setLoader(false);
+        }
+      }
+      
+      getData();
+    }
+    
+  }, [retriveResultCriptos]);
+
   return (
     <Container>
       <Img src={brandImg} alt="Cripto Quiter App" />
       <div>
         <Header>Cripto Quiter in real Time, try it!</Header>
         <FormQuoter setRetriveResultCriptos={setRetriveResultCriptos} />
+        { loader && <Spinner /> }
+        { results.PRICE && <ResultQuote results={results} />}
       </div>
     </Container>
   )

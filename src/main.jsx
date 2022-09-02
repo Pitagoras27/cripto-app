@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import CriptoApp from './CriptoApp'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <CriptoApp />
-  </React.StrictMode>
+  // </React.StrictMode>
 )

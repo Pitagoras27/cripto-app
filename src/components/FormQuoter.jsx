@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
+import { PATH_API } from "../config/endpoints.js";
 import { coins } from "../data/coins.js";
 import { useSelect } from "../hooks/useSelect";
 import { AlertMessage } from "./AlertMessage.jsx";
@@ -31,8 +32,7 @@ export const FormQuoter = ({ setRetriveResultCriptos }) => {
 
     const getData = async() => {
       try {
-        const currencyData = await fetch(
-          `https://min-api.cryptocompare.com/data/top/mktcapfull?limit=20&tsym=USD`);
+        const currencyData = await fetch(`${PATH_API}/top/mktcapfull?limit=20&tsym=USD`);
         const { Data } = await currencyData.json();
 
         const criptoData = Data.map(item => ({
@@ -46,7 +46,6 @@ export const FormQuoter = ({ setRetriveResultCriptos }) => {
       } catch(err) {
         setAlertErrorMessage('Don\'t retrive information, try later')
         setAlertError(true);
-    
       }
     }
 
@@ -63,7 +62,7 @@ export const FormQuoter = ({ setRetriveResultCriptos }) => {
     }
 
     setAlertError(false);
-    setRetriveResultCriptos(getCriptoOptions);
+    setRetriveResultCriptos({ currencySelected, criptoSelected });
   }
 
   return (
